@@ -2,7 +2,8 @@
 // API Service for Internship Eligibility Checker
 // ========================================================
 
-const BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) || '';
+const RAW_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) || '';
+const BASE_URL = RAW_BASE.replace(/\/+$/, '');
 const API_BASE = `${BASE_URL}/api`;
 
 const API = {
