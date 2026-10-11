@@ -18,16 +18,20 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Create a non-root application user for container security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
+# Create application user and pre-create data directory with full write permissions
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
+    && mkdir -p /app/data \
+    && chown -R appuser:appgroup /app \
+    && chmod -R 775 /app/data
 
-# Copy built executable jar from builder stage
-COPY --from=builder /app/target/internship-eligibility-checker-1.0.0.jar app.jar
+# Copy built executable jar from builder stage with correct ownership
+COPY --from=builder --chown=appuser:appgroup /app/target/internship-eligibility-checker-1.0.0.jar app.jar
+
+USER appuser
 
 # Environment Variables
 ENV PORT=8080 \
-    SPRING_PROFILES_ACTIVE=prod
+    SPRING_PROFILES_ACTIVE=default
 
 EXPOSE 8080
 
