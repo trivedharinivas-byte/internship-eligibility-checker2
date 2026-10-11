@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: internship-eligibility-checker
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: internship-mysql
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: internship-mysql
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: internship-mysql
+          property: password
+
+databases:
+  - name: internship-mysql
+    databaseName: internship_db
+    user: root
+    plan: free
+    region: oregon
