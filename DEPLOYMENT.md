@@ -15,9 +15,12 @@ This guide outlines multiple production-ready deployment strategies for the **In
 
 ---
 
-## 🐳 Option 1: Docker Compose (All-in-One Backend + DB + React)
+## 🐳 Option 1: Docker Compose (Full-Stack Backend + Frontend + MySQL)
 
-The project includes a multi-stage production [backend/Dockerfile](file:///d:/intership%20elgibality%20cheker/backend/Dockerfile) and [docker-compose.yml](file:///d:/intership%20elgibality%20cheker/docker-compose.yml).
+The project includes production Dockerfiles for both backend and frontend:
+- [backend/Dockerfile](file:///d:/intership%20elgibality%20cheker/backend/Dockerfile) (Multi-stage Java 21 build + hardened JRE runtime)
+- [frontend/Dockerfile](file:///d:/intership%20elgibality%20cheker/frontend/Dockerfile) (Multi-stage Node 20 build + Nginx reverse proxy)
+- [docker-compose.yml](file:///d:/intership%20elgibality%20cheker/docker-compose.yml) (Multi-container orchestration)
 
 ### Step 1: Run with Docker Compose
 ```bash
@@ -25,15 +28,16 @@ docker compose up -d --build
 ```
 
 ### What this does:
-1. Spins up a secured **MySQL 8.0** container with persistent storage volume `mysql_data`.
+1. Spins up a secured **MySQL 8.0** container (`internship_mysql`) with persistent storage volume `mysql_data`.
 2. Automatically seeds database tables and initial demo users from [schema-mysql.sql](file:///d:/intership%20elgibality%20cheker/schema-mysql.sql).
-3. Builds the Spring Boot fat JAR inside a multi-stage builder container.
-4. Launches the minimal, hardened JRE container running as a non-root user.
-5. Performs container health checks on `/api/health`.
+3. Builds the Spring Boot backend inside a multi-stage container and exposes port `8080`.
+4. Builds the React SPA and serves it via an optimized **Nginx** container on port `3000` with automated reverse-proxying of `/api/*` to the backend.
+5. Performs continuous health probes on `/api/health`.
 
 ### Access:
-- **Web Portal:** `http://your-server-ip:8080`
-- **Health Check:** `http://your-server-ip:8080/api/health`
+- **Frontend Web UI (React):** `http://localhost:3000`
+- **Backend API & Swagger/Health:** `http://localhost:8080/api/health`
+- **MySQL Database:** `localhost:3306`
 
 ### To stop or restart:
 ```bash
@@ -45,40 +49,32 @@ docker compose logs -f     # View live logs
 
 ## ☁️ Option 2: Cloud Deployment on Render.com
 
-Render offers free hosting for web services and databases.
+Render offers free hosting for web services.
 
 ### 1-Click Blueprint Deployment:
 1. Push this repository to **GitHub**.
 2. Go to [Render Dashboard](https://dashboard.render.com).
 3. Click **New +** $\rightarrow$ **Blueprint**.
-4. Connect your GitHub repository.
-5. Render reads [render.yaml](file:///d:/intership%20elgibality%20cheker/render.yaml) and automatically provisions:
-   - A **MySQL Database**
-   - A **Spring Boot Docker Web Service** connected to the database.
-
-### Manual Web Service Setup on Render:
-- **Root Directory:** `backend` (or run Maven from root)
-- **Build Command:** `mvn clean package -DskipTests`
-- **Start Command:** `java -Dserver.port=$PORT -jar target/internship-eligibility-checker-1.0.0.jar`
-- **Environment Variables:**
-  - `SPRING_PROFILES_ACTIVE`: `prod`
-  - `SPRING_DATASOURCE_URL`: `jdbc:mysql://<db-host>:<port>/<db-name>?useSSL=true`
-  - `SPRING_DATASOURCE_USERNAME`: `<db-user>`
-  - `SPRING_DATASOURCE_PASSWORD`: `<db-password>`
+4. Connect your GitHub repository: `https://github.com/trivedharinivas-byte/internship-eligibility-checker2`.
+5. Render reads [render.yaml](file:///d:/intership%20elgibality%20cheker/render.yaml) and provisions the web service automatically.
+6. The app boots immediately using the built-in embedded database. To connect to an external MySQL database (e.g. Aiven, Railway, or Clever Cloud), simply set `SPRING_PROFILES_ACTIVE=prod` and add `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and `SPRING_DATASOURCE_PASSWORD` under the service's **Environment** tab.
 
 ---
 
 ## 🚂 Option 3: Cloud Deployment on Railway.app
 
+Deploying to Railway is plug-and-play using the included [railway.json](file:///d:/intership%20elgibality%20cheker/railway.json):
+
 1. Go to [Railway.app](https://railway.app).
 2. Click **New Project** $\rightarrow$ **Deploy from GitHub repo**.
-3. Add a **MySQL Database** service to the canvas.
-4. In your application settings, link variables:
+3. Select your repository `internship-eligibility-checker2`.
+4. Railway automatically detects `backend/Dockerfile` and provisions the service.
+5. (Optional) Click **New** $\rightarrow$ **Database** $\rightarrow$ **Add MySQL**, then in the app's **Variables** tab add:
    - `SPRING_PROFILES_ACTIVE`: `prod`
-   - `SPRING_DATASOURCE_URL`: `${{MySQL.MYSQL_URL}}`
+   - `SPRING_DATASOURCE_URL`: `jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{MySQL.MYSQLDATABASE}}?useSSL=false&allowPublicKeyRetrieval=true`
    - `SPRING_DATASOURCE_USERNAME`: `${{MySQL.MYSQLUSER}}`
    - `SPRING_DATASOURCE_PASSWORD`: `${{MySQL.MYSQLPASSWORD}}`
-5. Railway automatically builds with the included [Procfile](file:///d:/intership%20elgibality%20cheker/Procfile) and [system.properties](file:///d:/intership%20elgibality%20cheker/system.properties).
+6. Click **Deploy**. Railway checks `/api/health` and activates the live deployment URL.
 
 ---
 

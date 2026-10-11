@@ -46,6 +46,19 @@ services:
       timeout: 5s
       retries: 3
 
+  # React Frontend (Vite + Nginx) Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: internship_frontend
+    restart: always
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+
 volumes:
   mysql_data:
     driver: local
