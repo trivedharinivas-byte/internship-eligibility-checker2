@@ -12,11 +12,12 @@ echo Using Java: %JAVA_HOME%
 "%JAVA_HOME%\bin\java.exe" -version
 echo.
 
-if exist "target\internship-eligibility-checker-1.0.0.jar" (
-    echo Launching packaged JAR...
-    "%JAVA_HOME%\bin\java.exe" -jar "target\internship-eligibility-checker-1.0.0.jar"
+if exist "backend\target\internship-eligibility-checker-1.0.0.jar" (
+    echo Launching packaged backend JAR...
+    "%JAVA_HOME%\bin\java.exe" -jar "backend\target\internship-eligibility-checker-1.0.0.jar"
 ) else (
-    echo Building and running with Maven...
+    echo Building and running backend with Maven...
+    cd backend
     "C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.1\plugins\maven-plugin\lib\maven3\bin\mvn.cmd" spring-boot:run
 )
 

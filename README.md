@@ -199,6 +199,34 @@ The system initializes with realistic demo accounts:
 
 ---
 
+## 📁 Project Directory Structure
+
+```
+internship-eligibility-checker/
+├── backend/                  # Java 21+ Spring Boot REST API
+│   ├── src/main/java/        # Controllers, Services, Repositories, DTOs, Entities
+│   ├── src/main/resources/   # Application configs (H2, MySQL, Prod) & Static Bundle
+│   ├── pom.xml               # Maven configuration & dependencies
+│   ├── Dockerfile            # Multi-stage production container
+│   └── .dockerignore
+├── frontend/                 # Standalone React 18 + Vite SPA
+│   ├── src/                  # React components, UI views, styling, API client
+│   ├── package.json          # Node dependencies & Vite scripts
+│   ├── vite.config.js        # Vite build & local proxy configuration
+│   ├── vercel.json           # Vercel deployment configuration
+│   └── netlify.toml          # Netlify deployment configuration
+├── docker-compose.yml        # Multi-container orchestration (Backend + MySQL)
+├── schema-mysql.sql          # Complete DDL schema & pre-seeded demo records
+├── render.yaml               # Render Cloud Infrastructure Blueprint
+├── Procfile                  # Cloud PaaS process definition
+├── system.properties         # Java runtime declaration
+├── run.bat                   # 1-Click Windows launcher
+├── README.md                 # Project documentation & algorithm guide
+└── DEPLOYMENT.md             # Multi-cloud deployment guide
+```
+
+---
+
 ## 🚀 How to Run the Application
 
 ### Option 1: 1-Click Windows Launcher (Recommended)
@@ -208,21 +236,31 @@ run.bat
 ```
 This automatically boots the Spring Boot server using the bundled executable JAR and opens on port `8080`.
 
-### Option 2: Run with Maven
+### Option 2: Run Backend with Maven
 ```bash
+cd backend
 mvn spring-boot:run
 ```
 
-### Option 3: Run with Local MySQL
+### Option 3: Run Standalone React Frontend (Vite Dev Server)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+The React frontend will start at `http://localhost:5173` with proxy configured to backend `http://localhost:8080`.
+
+### Option 4: Run Backend with Local MySQL
 1. Import the schema and initial data into your MySQL database:
    ```bash
    mysql -u root -p < schema-mysql.sql
    ```
 2. Run the application with the MySQL profile activated:
    ```bash
+   cd backend
    mvn spring-boot:run -Dspring-boot.run.profiles=mysql
    ```
-   *(Or edit `src/main/resources/application-mysql.properties` with your database credentials).*
+   *(Or edit `backend/src/main/resources/application-mysql.properties` with your database credentials).*
 
 ### Access the Web Application
 Open your web browser and navigate to:

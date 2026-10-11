@@ -17,7 +17,7 @@ This guide outlines multiple production-ready deployment strategies for the **In
 
 ## 🐳 Option 1: Docker Compose (All-in-One Backend + DB + React)
 
-The project includes a multi-stage production [Dockerfile](file:///d:/intership%20elgibality%20cheker/Dockerfile) and [docker-compose.yml](file:///d:/intership%20elgibality%20cheker/docker-compose.yml).
+The project includes a multi-stage production [backend/Dockerfile](file:///d:/intership%20elgibality%20cheker/backend/Dockerfile) and [docker-compose.yml](file:///d:/intership%20elgibality%20cheker/docker-compose.yml).
 
 ### Step 1: Run with Docker Compose
 ```bash
@@ -57,6 +57,7 @@ Render offers free hosting for web services and databases.
    - A **Spring Boot Docker Web Service** connected to the database.
 
 ### Manual Web Service Setup on Render:
+- **Root Directory:** `backend` (or run Maven from root)
 - **Build Command:** `mvn clean package -DskipTests`
 - **Start Command:** `java -Dserver.port=$PORT -jar target/internship-eligibility-checker-1.0.0.jar`
 - **Environment Variables:**
@@ -122,7 +123,7 @@ sudo mysql internship_db < schema-mysql.sql
 ### 3. Deploy JAR File
 ```bash
 sudo mkdir -p /opt/internship-checker
-sudo cp target/internship-eligibility-checker-1.0.0.jar /opt/internship-checker/app.jar
+sudo cp backend/target/internship-eligibility-checker-1.0.0.jar /opt/internship-checker/app.jar
 ```
 
 ### 4. Create Systemd Service (`/etc/systemd/system/internship.service`)

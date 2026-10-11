@@ -22,10 +22,10 @@ services:
       timeout: 5s
       retries: 5
 
-  # Spring Boot + React Backend Application
+  # Spring Boot Backend Application
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: internship_app
     restart: always
